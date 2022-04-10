@@ -3,6 +3,7 @@ package project.uca.power4.entity;
 import project.uca.power4.ai.AIModule;
 import project.uca.power4.components.Grid;
 import project.uca.power4.components.Token;
+import project.uca.power4.ui.GameInterface;
 
 public class BotPlayer extends Player {
 
@@ -20,7 +21,12 @@ public class BotPlayer extends Player {
     }
 
     @Override
-    public void playTurn() {
+    public void playTurn(GameInterface ui) {
 
+    }
+
+    @Override
+    public boolean isAI() {
+        return true;
     }
 }

@@ -2,6 +2,7 @@ package project.uca.power4.entity;
 
 import project.uca.power4.components.Grid;
 import project.uca.power4.components.Token;
+import project.uca.power4.ui.GameInterface;
 
 public abstract class Player {
     private final Token color;
@@ -29,5 +30,6 @@ public abstract class Player {
     }
 
     public abstract String getName();
-    public abstract void playTurn();
+    public abstract void playTurn(GameInterface ui);
+    public abstract boolean isAI();
 }

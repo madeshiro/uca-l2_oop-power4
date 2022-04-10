@@ -1,48 +1,62 @@
 package project.uca.power4.components;
 
+import java.util.function.Consumer;
+
 public final class Grid {
     private Box[] availableBoxes;
     private Box cornerDownLeft;
 
     private int occupiedBoxes;
 
+    private String printToken(Token token) {
+        switch (token) {
+            case Yellow:
+                return "Y";
+            case Red:
+                return "R";
+            case Empty: default:
+                return "E";
+        }
+    }
+
     public Grid() {
         initMatrix();
     }
 
-    public void reset() {
-        initMatrix();
-    }
-
     public void initMatrix() {
-        Box[][] boxes = new Box[6][7];
+        cornerDownLeft = new Box();
         availableBoxes = new Box[7];
+        availableBoxes[0] = cornerDownLeft;
+        occupiedBoxes  = 0;
 
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
-                boxes[i][j] = new Box();
+        Box lefty = cornerDownLeft;
+        for (int i = 1; i < 6; i++) {
+            Box box = new Box();
+            box.setNeighbour(lefty, Direction.DOWN);
+            lefty = box;
+        }
+
+        for (int col = 1; col < 7; col++) {
+            Box downty = new Box();
+            lefty = availableBoxes[col-1];
+            downty.setNeighbour(lefty, Direction.LEFT);
+            lefty.setNeighbour(downty, Direction.RIGHT);
+
+            availableBoxes[col] = downty;
+
+            lefty = lefty.getNeighbour(Direction.UP);
+            while (lefty != null) {
+                Box box = new Box();
+                box.setNeighbour(downty, Direction.DOWN);
+                box.setNeighbour(lefty, Direction.LEFT);
+
+                lefty.setNeighbour(box, Direction.RIGHT);
+                downty.setNeighbour(box, Direction.UP);
+
+                lefty = lefty.getNeighbour(Direction.UP);
+                downty = box;
             }
         }
-
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 7; j++) {
-                if (i > 0)
-                    boxes[i][j].setNeighbour(boxes[i-1][j], Direction.DOWN);
-                if (j > 0)
-                    boxes[i][j].setNeighbour(boxes[i][j-1], Direction.LEFT);
-                if (i < 5)
-                    boxes[i][j].setNeighbour(boxes[i+1][j], Direction.UP);
-                if (j < 6)
-                    boxes[i][j].setNeighbour(boxes[i][j+1], Direction.RIGHT);
-            }
-        }
-
-        for (int i = 0; i < 7; i++) {
-            availableBoxes[i] = boxes[0][i];
-        }
-
-        cornerDownLeft = boxes[0][0];
-        occupiedBoxes = 0;
     }
 
     public Box getLinkedMatrix() {
@@ -63,6 +77,7 @@ public final class Grid {
         Box box = getAvailableBoxFrom(column);
         if (box != null) {
             box.setToken(token);
+            availableBoxes[column-1] = box.getNeighbour(Direction.UP);
             occupiedBoxes++;
             return true;
         } else {
@@ -72,5 +87,24 @@ public final class Grid {
 
     public boolean isFull() {
         return occupiedBoxes == 42;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        Box lefty = this.getLinkedMatrix();
+        while (lefty != null) {
+            Box row = lefty;
+            StringBuilder rowBuffer = new StringBuilder();
+            while (row != null) {
+                rowBuffer.append(printToken(row.getToken()));
+                row = row.getNeighbour(Direction.RIGHT);
+            }
+            rowBuffer.append('\n');
+            buffer.insert(0, rowBuffer);
+            lefty = lefty.getNeighbour(Direction.UP);
+        }
+
+        return buffer.toString();
     }
 }

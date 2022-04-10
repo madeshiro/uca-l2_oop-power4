@@ -2,6 +2,13 @@ package project.uca.power4.ai;
 
 public class ProbabilityTree {
 
+    enum Priority {
+        Negligible /* Next step is Negligible */,
+        Casual     /* Next step is Non-Decisive */,
+        High       /* Next step can be decisive */,
+        Highest /* Next step will be decisive */
+    }
+
     static class Branch {
 
     }
