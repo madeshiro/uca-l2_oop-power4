@@ -8,8 +8,8 @@ import project.uca.power4.components.Token;
 import project.uca.power4.entity.LivingPlayer;
 import project.uca.power4.entity.Player;
 
-import java.io.Console;
-import java.io.IOException;
+import java.io.File;
+import java.util.Locale;
 
 public class ConsoleUI implements GameInterface {
 
@@ -18,7 +18,7 @@ public class ConsoleUI implements GameInterface {
 
     private static final String RED    = "\u001b[31m";
     private static final String YELLOW = "\u001b[33m";
-    private static final String RESET  = "\u001b[30m";
+    private static final String RESET  = "\u001b[0m";
 
     private String printToken(Token token) {
         String color;
@@ -43,6 +43,16 @@ public class ConsoleUI implements GameInterface {
     }
 
     @Override
+    public boolean requestLoadSave() {
+        File save = new File("save.txt");
+        if (save.exists()) {
+            app.out.print("Do you want to load your previous game ? (y/n) ");
+            return "y".equals(app.console.readLine().toLowerCase(Locale.ROOT));
+        }
+        return false;
+    }
+
+    @Override
     public void updateGrid() {
         StringBuilder buffer = new StringBuilder();
         Box lefty = gameGrid.getLinkedMatrix();
@@ -54,7 +64,7 @@ public class ConsoleUI implements GameInterface {
                 row = row.getNeighbour(Direction.RIGHT);
             }
             rowBuffer.append('\n');
-            buffer.insert(0, rowBuffer.toString());
+            buffer.insert(0, rowBuffer);
             lefty = lefty.getNeighbour(Direction.UP);
         }
 
@@ -62,21 +72,20 @@ public class ConsoleUI implements GameInterface {
     }
 
     @Override
-    public int waitPlayer(LivingPlayer player) {
-        int choice = 0;
-        boolean validChoice = false;
-
-        while (!validChoice) {
+    public Action waitPlayer(LivingPlayer player) {
+        while (true) {
             try {
-                app.out.print("In which column would you like to put your token ? (1 -> 7)\n$ ");
-                choice = Integer.parseInt(app.console.readLine());
-                validChoice = (choice >= 1 && choice <= 7);
-            } catch (NumberFormatException e) {
-                app.out.println("Invalid number ! (expect number between 1 and 7)");
+                app.out.printf("It's the turn of %s !\n", player.getName());
+                app.out.print("Type the column where you want to put your token (1 to 7) or 'q' to save&quit\n$ ");
+                String choice = app.console.readLine();
+                if (choice.equals("q")) {
+                    return Action.Quit;
+                }
+                return Action.values()[Integer.parseInt(choice)];
+            } catch (NumberFormatException | IndexOutOfBoundsException ex) {
+                app.out.println("Invalid choice ! (expect number between 1 and 7 or 'q')");
             }
         }
-
-        return choice;
     }
 
     @Override

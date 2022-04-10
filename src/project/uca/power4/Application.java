@@ -7,6 +7,7 @@ import project.uca.power4.components.Token;
 import project.uca.power4.entity.BotPlayer;
 import project.uca.power4.entity.LivingPlayer;
 import project.uca.power4.entity.Player;
+import project.uca.power4.ui.ConsoleUI;
 import project.uca.power4.ui.GameInterface;
 
 import java.io.*;
@@ -76,7 +77,6 @@ public class Application {
                 rows[row] = reader.readLine();
             }
 
-            gameGrid = new Grid();
             Box lefty = gameGrid.getLinkedMatrix();
             int _row = 0;
             while (lefty != null) {
@@ -119,21 +119,56 @@ public class Application {
     }
 
     public int exec() {
+        this.gameGrid = new Grid();
+
         if (enableGui) {
             // Do if I got any time left
-            log.info("GUI Enable !");
+            // log.info("GUI Enable !");
+            log.severe("Unable to enable GUI (not implemented yet !)");
+            return 0x10;
         } else {
             log.info("Playing in mode console !");
+            gameInterface = new ConsoleUI(this, gameGrid);
         }
 
-        if (gameInterface.requestPlayers()) {
+        if (!gameInterface.requestLoadSave() || !load(new File("save.txt").toPath())) {
+            log.info("Create empty grid and request player names...");
 
+            if (gameInterface.requestPlayers()) {
+                player1 = new LivingPlayer(gameGrid, Token.Red, gameInterface.requestPlayerName("Player 1"));
+                player2 = new LivingPlayer(gameGrid, Token.Yellow, gameInterface.requestPlayerName("Player 2"));
+            } else {
+                player1 = new LivingPlayer(gameGrid, Token.Red, gameInterface.requestPlayerName("Player 1"));
+                player2 = new BotPlayer(gameGrid, Token.Yellow);
+            }
         }
 
-        return 0; // no error
+        return gameLoop();
     }
 
-    private void gameLoop() {
+    private int gameLoop() {
+        Player[] players = {player1, player2};
 
+        int turn = 0;
+        do {
+            ui().updateGrid();
+
+            Box box = players[turn].playTurn(ui());
+            if (box == null) {
+                save(new File("save.txt").toPath());
+                log.info("Quit the program...");
+                return 0;
+            } else if (box.checkAlignment()) {
+                ui().updateGrid();
+                ui().displayWinner(players[turn]);
+                return 0;
+            } else if (gameGrid.isFull()) {
+                out.println("The grid is full, TIE GAME!");
+                return 0;
+            }
+            turn = (turn+1)%2;
+        } while (true);
+
+        // return -1; // an error occurred if this point is reached
     }
 }

@@ -8,13 +8,18 @@ import javax.swing.*;
 public class FrameUI extends JFrame implements GameInterface {
 
     @Override
+    public boolean requestLoadSave() {
+        return false;
+    }
+
+    @Override
     public void updateGrid() {
 
     }
 
     @Override
-    public int waitPlayer(LivingPlayer player) {
-        return 0;
+    public Action waitPlayer(LivingPlayer player) {
+        return Action.Quit;
     }
 
     @Override

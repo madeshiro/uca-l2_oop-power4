@@ -48,36 +48,44 @@ public class Box {
         if (token == Token.Empty || getNeighbour(direction) == null) {
             return false;
         } else {
-            return getNeighbour(direction).check(direction, token, 1);
+            return getNeighbour(direction).check(direction, token, 2);
         }
     }
 
     private boolean check(Direction direction, Token token, int iter) {
-        if (iter >= 4)
-            return true;
-        else if (this.token != token || getNeighbour(direction) == null) {
-            return false;
-        } else {
-            return getNeighbour(direction).check(direction, token, iter+1);
+        if (token == this.token) {
+            if (iter >= 4) {
+                return true;
+            } else if (getNeighbour(direction) != null) {
+                return getNeighbour(direction).check(direction, token, iter + 1);
+            } else {
+                return false;
+            }
         }
+
+        return false;
     }
 
     public boolean check(OptionalDirection direction) {
         if (token == Token.Empty || getNeighbour(direction) == null) {
             return false;
         } else {
-            return getNeighbour(direction).check(direction, token, 1);
+            return getNeighbour(direction).check(direction, token, 2);
         }
     }
 
     private boolean check(OptionalDirection direction, Token token, int iter) {
-        if (iter >= 4)
-            return true;
-        else if (this.token != token || getNeighbour(direction) == null) {
-            return false;
-        } else {
-            return getNeighbour(direction).check(direction, token, iter+1);
+        if (token == this.token) {
+            if (iter >= 4) {
+                return true;
+            } else if (getNeighbour(direction) != null) {
+                return getNeighbour(direction).check(direction, token, iter + 1);
+            } else {
+                return false;
+            }
         }
+
+        return false;
     }
 
     void setNeighbour(Box box, Direction which) {

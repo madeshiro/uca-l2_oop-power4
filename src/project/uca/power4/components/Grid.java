@@ -1,7 +1,5 @@
 package project.uca.power4.components;
 
-import java.util.function.Consumer;
-
 public final class Grid {
     private Box[] availableBoxes;
     private Box cornerDownLeft;
@@ -33,6 +31,7 @@ public final class Grid {
         for (int i = 1; i < 6; i++) {
             Box box = new Box();
             box.setNeighbour(lefty, Direction.DOWN);
+            lefty.setNeighbour(box, Direction.UP);
             lefty = box;
         }
 
@@ -71,22 +70,23 @@ public final class Grid {
         return availableBoxes[column-1];
     }
 
-    public boolean putToken(Token token, int column) throws IllegalArgumentException {
-        if (this.isFull()) return false;
+    public Box putToken(Token token, int column) throws IllegalArgumentException {
+        if (this.isFull()) return null;
 
         Box box = getAvailableBoxFrom(column);
         if (box != null) {
             box.setToken(token);
             availableBoxes[column-1] = box.getNeighbour(Direction.UP);
             occupiedBoxes++;
-            return true;
+            return box;
         } else {
-            return false;
+            System.out.println("RETURN NULL");
+            return null;
         }
     }
 
     public boolean isFull() {
-        return occupiedBoxes == 42;
+        return occupiedBoxes >= 42;
     }
 
     @Override

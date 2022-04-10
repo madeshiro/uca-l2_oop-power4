@@ -1,5 +1,6 @@
 package project.uca.power4.entity;
 
+import project.uca.power4.components.Box;
 import project.uca.power4.components.Grid;
 import project.uca.power4.components.Token;
 import project.uca.power4.ui.GameInterface;
@@ -25,11 +26,11 @@ public abstract class Player {
         this.grid = grid;
     }
 
-    public boolean putToken(int column) {
+    public Box putToken(int column) {
         return grid.putToken(color, column);
     }
 
     public abstract String getName();
-    public abstract void playTurn(GameInterface ui);
+    public abstract Box playTurn(GameInterface ui);
     public abstract boolean isAI();
 }
