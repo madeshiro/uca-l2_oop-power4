@@ -34,6 +34,12 @@ public class Application {
 
     Player player1, player2;
 
+    /**
+     * Create a new Application
+     * @param gui If true, a JFrame will be displayed.
+     * @see ConsoleUI
+     * @see project.uca.power4.ui.FrameUI
+     */
     public Application(boolean gui) {
         this.log = Logger.getLogger("Power4");
         this.out = System.out;
@@ -48,6 +54,13 @@ public class Application {
         return gameInterface;
     }
 
+    /**
+     * Save the grid state in a file designated by a Path object
+     * @param path the file's path
+     * @see Path
+     * @see File#toPath()
+     * @return True if the grid has been successfully saved, false otherwise
+     */
     public boolean save(Path path) {
         try {
             BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset(), WRITE, CREATE, TRUNCATE_EXISTING);
@@ -66,6 +79,13 @@ public class Application {
         }
     }
 
+    /**
+     * Load the grid state from a file designated by a Path object
+     * @param path the file's path
+     * @see Path
+     * @see File#toPath()
+     * @return True if the party has been loaded successfully, false otherwise
+     */
     public boolean load(Path path) {
         try {
             BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
@@ -114,10 +134,18 @@ public class Application {
 
     }
 
+    /**
+     * Get if the application is opened with Gui enabled
+     * @return if gui is enabled
+     */
     public boolean isEnableGui() {
         return enableGui;
     }
 
+    /**
+     * Execute the program.
+     * @return the exit status
+     */
     public int exec() {
         this.gameGrid = new Grid();
 
@@ -146,6 +174,10 @@ public class Application {
         return gameLoop();
     }
 
+    /**
+     * The game loop
+     * @return exit status
+     */
     private int gameLoop() {
         Player[] players = {player1, player2};
 
@@ -155,8 +187,11 @@ public class Application {
 
             Box box = players[turn].playTurn(ui());
             if (box == null) {
-                save(new File("save.txt").toPath());
-                log.info("Quit the program...");
+                if (save(new File("save.txt").toPath())) {
+                    log.info("Grid state has been saved.");
+                } else {
+                    log.warning("Unable to save the grid !");
+                }
                 return 0;
             } else if (box.checkAlignment()) {
                 ui().updateGrid();

@@ -11,10 +11,20 @@ public class Box {
         token = Token.Empty;
     }
 
+    /**
+     * Get the direct neighbour of the box
+     * @param direction the position of the neighbour to get
+     * @return the neighbour if exists, null otherwise.
+     */
     public Box getNeighbour(Direction direction) {
         return neighbour.get(direction);
     }
 
+    /**
+     * Get the neighbour in a diagonal direction from the box
+     * @param diagonal the position of the neighbour to get
+     * @return the neighbour if exists, null otherwise.
+     */
     public Box getNeighbour(OptionalDirection diagonal) {
         assert diagonal != null;
 
@@ -30,6 +40,10 @@ public class Box {
         this.token = token;
     }
 
+    /**
+     * Check the alignment of tokens to tell if the power 4 has been realised.
+     * @return True if 4 tokens of the same colour are aligned in any direction.
+     */
     public boolean checkAlignment() {
         for (Direction direction : Direction.values()) {
             if (check(direction))

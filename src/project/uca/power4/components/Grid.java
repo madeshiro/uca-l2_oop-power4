@@ -6,21 +6,16 @@ public final class Grid {
 
     private int occupiedBoxes;
 
-    private String printToken(Token token) {
-        switch (token) {
-            case Yellow:
-                return "Y";
-            case Red:
-                return "R";
-            case Empty: default:
-                return "E";
-        }
-    }
-
+    /**
+     * Create a new grid
+     */
     public Grid() {
         initMatrix();
     }
 
+    /**
+     * Init the grid
+     */
     public void initMatrix() {
         cornerDownLeft = new Box();
         availableBoxes = new Box[7];
@@ -58,10 +53,20 @@ public final class Grid {
         }
     }
 
+    /**
+     * Get the corner down left of the chained matrix.
+     * @return the corner down left
+     */
     public Box getLinkedMatrix() {
         return cornerDownLeft;
     }
 
+    /**
+     * Get the box available of the designated column
+     * @param column the column to get the available box from
+     * @return the box if exists, null otherwise.
+     * @throws IllegalArgumentException if the column number if out of bound.
+     */
     public Box getAvailableBoxFrom(int column) throws IllegalArgumentException {
         if (column < 1 || column > 7) {
             throw new IllegalArgumentException("Column number must be between 1 and 7 !");
@@ -70,6 +75,13 @@ public final class Grid {
         return availableBoxes[column-1];
     }
 
+    /**
+     * Put a token at the designed column
+     * @param token the token to put in the grid
+     * @param column the column where to put it
+     * @return the box where the token has been putted, Null if impossible
+     * @throws IllegalArgumentException if the column number is out of bound.
+     */
     public Box putToken(Token token, int column) throws IllegalArgumentException {
         if (this.isFull()) return null;
 
@@ -80,7 +92,6 @@ public final class Grid {
             occupiedBoxes++;
             return box;
         } else {
-            System.out.println("RETURN NULL");
             return null;
         }
     }
@@ -97,7 +108,7 @@ public final class Grid {
             Box row = lefty;
             StringBuilder rowBuffer = new StringBuilder();
             while (row != null) {
-                rowBuffer.append(printToken(row.getToken()));
+                rowBuffer.append(row.getToken().getInitial());
                 row = row.getNeighbour(Direction.RIGHT);
             }
             rowBuffer.append('\n');
