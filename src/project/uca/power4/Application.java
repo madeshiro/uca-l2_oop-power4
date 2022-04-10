@@ -84,9 +84,9 @@ public class Application {
      * @param path the file's path
      * @see Path
      * @see File#toPath()
-     * @return True if the party has been loaded successfully, false otherwise
+     * @return Which player will play next (0 or 1), -1 on error
      */
-    public boolean load(Path path) {
+    public int load(Path path) {
         try {
             BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
             String player1 = reader.readLine();
@@ -99,6 +99,7 @@ public class Application {
 
             Box lefty = gameGrid.getLinkedMatrix();
             int _row = 0;
+            int filled = 0;
             while (lefty != null) {
                 Box row = lefty;
                 int col = 0;
@@ -107,9 +108,11 @@ public class Application {
                     switch (c) {
                         case 'R':
                             gameGrid.putToken(Token.Red, col+1);
+                            filled++;
                             break;
                         case 'Y':
                             gameGrid.putToken(Token.Yellow, col+1);
+                            filled++;
                             break;
                     }
                     col++;
@@ -126,10 +129,10 @@ public class Application {
                 this.player2 = new LivingPlayer(gameGrid, Token.Yellow, player2);
             }
 
-            return true;
+            return filled%2;
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
 
     }
@@ -159,7 +162,8 @@ public class Application {
             gameInterface = new ConsoleUI(this, gameGrid);
         }
 
-        if (!gameInterface.requestLoadSave() || !load(new File("save.txt").toPath())) {
+        int turn=0;
+        if (!gameInterface.requestLoadSave() || (turn=load(new File("save.txt").toPath())) == -1) {
             log.info("Create empty grid and request player names...");
 
             if (gameInterface.requestPlayers()) {
@@ -171,17 +175,16 @@ public class Application {
             }
         }
 
-        return gameLoop();
+        return gameLoop(turn);
     }
 
     /**
      * The game loop
      * @return exit status
      */
-    private int gameLoop() {
+    private int gameLoop(int turn) {
         Player[] players = {player1, player2};
 
-        int turn = 0;
         do {
             ui().updateGrid();
 
